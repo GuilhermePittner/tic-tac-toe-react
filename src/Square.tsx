@@ -4,7 +4,6 @@ type Props = {
     index: number
     player?: string
     onClick(event: any): void;
-
 }
 
 function Square({ player, index, onClick }: Props) {

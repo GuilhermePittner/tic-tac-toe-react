@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Square from "./Square";
+import Button from "./Button";
 
 
 /* ================== */
@@ -38,6 +39,8 @@ const INITIAL_SCORES: Scores = {
   X: 0, O: 0
 }
 
+const CHECK_WIN = false;
+
 
 function Game() {
 
@@ -51,6 +54,7 @@ function Game() {
   const [gameState, setGameState] = useState(GAME_STATE);
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [score, setScore] = useState(INITIAL_SCORES);
+  const [checkWin, setCheckWin] = useState(CHECK_WIN);
 
 
   /* ================== */
@@ -73,7 +77,7 @@ function Game() {
   // var is updated. 
   /* ================== */
   useEffect(() => {
-    if (gameState === GAME_STATE){
+    if (gameState === GAME_STATE) {
       return
     }
     checkVictory();
@@ -119,6 +123,7 @@ function Game() {
     }
 
     changePlayer();
+    setCheckWin(false);
   }
 
   const resetBoard = () => setGameState(GAME_STATE);
@@ -134,11 +139,13 @@ function Game() {
     localStorage.setItem("scores", JSON.stringify(newScores));
 
     resetBoard();
+    setCheckWin(false);
   }
 
   const showDraw = () => {
     window.alert(`There's no winner in this round.`);
     resetBoard();
+    setCheckWin(false);
   }
 
 
@@ -148,6 +155,9 @@ function Game() {
   // update it
   /* ================== */
   const handlePlayerMove = (event: any) => {
+    if (checkWin) return;
+    setCheckWin(true);
+
     const squareIndex = Number(event.target.getAttribute("data-cell-index"));
     const currentValue = gameState[squareIndex];
 
@@ -165,9 +175,25 @@ function Game() {
   }
 
 
+  /* ================== */
+  // creating my own 
+  // methods in order to 
+  // reset scores or game
+  /* ================== */
+  const resetScores = () => {
+    window.alert('Reseting scores...');
+    setScore(INITIAL_SCORES);
+    localStorage.setItem("scores", JSON.stringify(INITIAL_SCORES));
+  }
+
+  const resetGame = () => {
+    window.alert('Reseting match...');
+    setGameState(GAME_STATE);
+  }
+
 
   return (
-    <div className="h-full p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
+    <div className="min-h-screen p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
       <h1 className="font-lobster text-center text-5xl mb-4 text-white">
         I've played this game before...
       </h1>
@@ -190,6 +216,11 @@ function Game() {
           <p className="text-white mt-5">It's your turn, <span> {currentPlayer} !</span></p>
           <p className="text-white mt-5">Player X wins: <span> {score["X"]} </span></p>
           <p className="text-white mt-5">Player O wins: <span> {score["O"]} </span></p>
+        </div>
+
+        <div className="flex justify-center p-8 gap-8">
+          <Button text="Reset Scores" onClick={resetScores} />
+          <Button text="Reset Game" onClick={resetGame} />
         </div>
       </div>
     </div>
